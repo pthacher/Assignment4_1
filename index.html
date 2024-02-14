@@ -1,6 +1,128 @@
-<title>Intro to PopupTemplate - 4.8</title>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Intro to PopupTemplate - 4.8</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/css/main.css">
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="viewDiv"></div>
 
-  <link rel="stylesheet" href="https://js.arcgis.com/4.18/esri/css/main.css">
-  <script src="https://js.arcgis.com/4.18/"></script>
+    <script src="https://js.arcgis.com/4.18/"></script>
+    <script>
+        require([
+            "esri/Map",
+            "esri/layers/FeatureLayer",
+            "esri/views/MapView",
+            "esri/PopupTemplate",
+            "esri/symbols/PictureMarkerSymbol",
+            "esri/renderers/SimpleRenderer",
+            "dojo/domReady!"
+        ], function(
+            Map,
+            FeatureLayer,
+            MapView,
+            PopupTemplate,
+            PictureMarkerSymbol,
+            SimpleRenderer
+        ) {
 
-<div id="viewDiv"></div>
+            // Create the map
+            var map = new Map({
+                basemap: "gray"
+            });
+
+            // Create the MapView
+            var view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-90.3, 38.6],
+                zoom: 9
+            });
+
+            // Create a PopupTemplate
+            var template = new PopupTemplate({
+                title: "Neighborhood: {NHD_NAME}",
+                content: [{
+                    type: "fields",
+                    fieldInfos: [{
+                            fieldName: "NHD_NUM",
+                            label: "Neighborhood Number Integer: ",
+                            visible: true
+                        },
+                        {
+                            fieldName: "ANGLE",
+                            label: "Angle: ",
+                            visible: true,
+                            format: {
+                                digitSeparator: true,
+                                places: 0
+                            }
+                        },
+                        {
+                            fieldName: "NHD_NUMTXT",
+                            label: "Neighborhood Number & Name: ",
+                            visible: true,
+                            format: {
+                                digitSeparator: true,
+                                places: 0
+                            }
+                        },
+                        {
+                            fieldName: "NHD_NUM_ST",
+                            label: "Neighborhood Number String",
+                            visible: true,
+                            format: {
+                                digitSeparator: true,
+                                places: 0
+                            }
+                        },
+                        {
+                            fieldName: "Shape__Area",
+                            label: "Shape Area",
+                            visible: true,
+                            format: {
+                                digitSeparator: true,
+                                places: 0
+                            }
+                        }
+                    ]
+                }]
+            });
+
+            // Create a symbol for the feature layer
+            var symbol = new PictureMarkerSymbol({
+                url: "https://cdn.iconscout.com/icon/premium/png-256-thumb/hockey-240-984443.png",
+                width: "64px",
+                height: "64px"
+            });
+
+            // Create a renderer for the feature layer
+            var renderer = new SimpleRenderer({
+                symbol: symbol
+            });
+
+            // Create a feature layer
+            var featureLayer = new FeatureLayer({
+                url: "https://services2.arcgis.com/bB9Y1bGKerz1PTl5/ArcGIS/rest/services/STL_Neighborhood/FeatureServer/0",
+                outFields: ["*"],
+                popupTemplate: template,
+                renderer: renderer
+            });
+
+            // Add the feature layer to the map
+            map.add(featureLayer);
+
+        });
+    </script>
+</body>
+</html>
